@@ -1,42 +1,24 @@
-# المعلم السوداني (Sudanese Teacher)<div align="center">
+<div align="center">
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+# المعلم السوداني (Sudanese Teacher)
 
-<div align="center"></div>
+<img width="1200" height="475" alt="Sudanese Teacher Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 
-
-
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)# Run and deploy your AI Studio app
-
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
+![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
 
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)This contains everything you need to run your app locally.
+**AI-powered educational tutor for the Sudanese curriculum**  
+مساعد تعليمي ذكي مدعوم بالذكاء الاصطناعي للمناهج السودانية
 
-
-
-**AI-powered educational tutor for the Sudanese curriculum**View your app in AI Studio: https://ai.studio/apps/drive/17rSjJTkUF_dHI5VIErp9OP2TwMkGkm2E
-
-
-
-مساعد تعليمي ذكي مدعوم بالذكاء الاصطناعي للمناهج السودانية## Run Locally
-
-
-
-[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Deployment](#-deployment)**Prerequisites:**  Node.js
-
-
+[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Production Deployment](#-production-deployment)
 
 </div>
 
-1. Install dependencies:
+---
 
----   `npm install`
-
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-
-## 📖 Overview3. Run the app:
-
-   `npm run dev`
+## 📖 Overview
 
 **المعلم السوداني** is an intelligent educational assistant specifically designed for students following the Sudanese curriculum (Grades 1-12). Powered by Google's Gemini 2.5 Flash with File Search capabilities, it provides accurate, curriculum-based answers to student questions across all subjects.
 
@@ -80,7 +62,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/sudatutor-v6.git
+   git clone https://github.com/O96a/sudatutor-v6.git
    cd sudatutor-v6
    ```
 
@@ -250,7 +232,329 @@ systemInstruction: `Your custom instructions here...`
 
 ---
 
-## 🏗️ Build for Production
+## 🚀 Production Deployment
+
+This section provides detailed instructions for deploying to a production Linux server using Docker.
+
+### Prerequisites
+
+- **Linux Server** (Ubuntu 20.04+ recommended)
+- **Docker** and **Docker Compose** installed
+- **Domain name** (optional but recommended)
+- **Gemini API Key** from [Google AI Studio](https://aistudio.google.com/apikey)
+
+### Step 1: Prepare Your Linux Server
+
+1. **Update system packages**
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+2. **Install Docker**
+   ```bash
+   # Install Docker
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sudo sh get-docker.sh
+   
+   # Add your user to docker group
+   sudo usermod -aG docker $USER
+   
+   # Activate changes
+   newgrp docker
+   ```
+
+3. **Install Docker Compose**
+   ```bash
+   sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   sudo chmod +x /usr/local/bin/docker-compose
+   docker-compose --version
+   ```
+
+4. **Install Git** (if not already installed)
+   ```bash
+   sudo apt install git -y
+   ```
+
+### Step 2: Clone and Setup Project
+
+1. **Clone the repository**
+   ```bash
+   cd /opt
+   sudo git clone https://github.com/O96a/sudatutor-v6.git
+   sudo chown -R $USER:$USER sudatutor-v6
+   cd sudatutor-v6
+   ```
+
+2. **Create environment file**
+   ```bash
+   nano .env
+   ```
+   
+   Add the following (replace with your actual API key):
+   ```env
+   GEMINI_API_KEY=your-actual-gemini-api-key-here
+   NODE_ENV=production
+   ```
+   
+   Save with `Ctrl+O`, then `Enter`, then `Ctrl+X`
+
+3. **Set proper permissions**
+   ```bash
+   chmod 600 .env
+   ```
+
+### Step 3: Build and Deploy with Docker
+
+1. **Build the Docker image**
+   ```bash
+   docker build -t sudatutor:latest .
+   ```
+   
+   This will take a few minutes the first time.
+
+2. **Start the application**
+   ```bash
+   docker-compose up -d
+   ```
+   
+   The `-d` flag runs it in detached mode (background).
+
+3. **Verify the application is running**
+   ```bash
+   docker-compose ps
+   docker-compose logs -f sudatutor
+   ```
+   
+   Press `Ctrl+C` to exit logs.
+
+4. **Test the application**
+   ```bash
+   curl http://localhost:3000
+   ```
+   
+   You should see HTML content returned.
+
+### Step 4: Configure Firewall
+
+1. **Allow HTTP traffic**
+   ```bash
+   sudo ufw allow 3000/tcp
+   sudo ufw enable
+   sudo ufw status
+   ```
+
+### Step 5: Setup Nginx Reverse Proxy (Recommended)
+
+For production, it's recommended to use Nginx as a reverse proxy with SSL.
+
+1. **Install Nginx**
+   ```bash
+   sudo apt install nginx -y
+   ```
+
+2. **Create Nginx configuration**
+   ```bash
+   sudo nano /etc/nginx/sites-available/sudatutor
+   ```
+   
+   Add the following configuration (replace `your-domain.com` with your actual domain):
+   ```nginx
+   server {
+       listen 80;
+       server_name your-domain.com www.your-domain.com;
+       
+       location / {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+   }
+   ```
+
+3. **Enable the site**
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/sudatutor /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl restart nginx
+   ```
+
+4. **Allow Nginx through firewall**
+   ```bash
+   sudo ufw allow 'Nginx Full'
+   ```
+
+### Step 6: Setup SSL with Let's Encrypt (Recommended)
+
+1. **Install Certbot**
+   ```bash
+   sudo apt install certbot python3-certbot-nginx -y
+   ```
+
+2. **Obtain SSL certificate**
+   ```bash
+   sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+   ```
+   
+   Follow the prompts. Choose to redirect HTTP to HTTPS.
+
+3. **Test auto-renewal**
+   ```bash
+   sudo certbot renew --dry-run
+   ```
+
+### Step 7: Setup Auto-restart on Server Reboot
+
+1. **Create systemd service** (alternative to Docker restart policy)
+   ```bash
+   sudo nano /etc/systemd/system/sudatutor.service
+   ```
+   
+   Add:
+   ```ini
+   [Unit]
+   Description=Sudanese Teacher Application
+   Requires=docker.service
+   After=docker.service
+   
+   [Service]
+   Type=oneshot
+   RemainAfterExit=yes
+   WorkingDirectory=/opt/sudatutor-v6
+   ExecStart=/usr/local/bin/docker-compose up -d
+   ExecStop=/usr/local/bin/docker-compose down
+   
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+2. **Enable the service**
+   ```bash
+   sudo systemctl enable sudatutor.service
+   sudo systemctl start sudatutor.service
+   ```
+
+### Deployment Commands Reference
+
+```bash
+# View logs
+docker-compose logs -f
+
+# Restart application
+docker-compose restart
+
+# Stop application
+docker-compose down
+
+# Update application (pull new changes)
+cd /opt/sudatutor-v6
+git pull origin main
+docker-compose down
+docker build -t sudatutor:latest .
+docker-compose up -d
+
+# View container status
+docker-compose ps
+
+# Check container health
+docker inspect sudatutor-v6-sudatutor-1 --format='{{.State.Health.Status}}'
+
+# Access container shell (for debugging)
+docker-compose exec sudatutor sh
+```
+
+### Monitoring and Maintenance
+
+1. **Check disk space**
+   ```bash
+   df -h
+   ```
+
+2. **Clean up old Docker images**
+   ```bash
+   docker system prune -a
+   ```
+
+3. **View application logs**
+   ```bash
+   docker-compose logs --tail=100 -f
+   ```
+
+4. **Monitor resource usage**
+   ```bash
+   docker stats
+   ```
+
+### Troubleshooting
+
+**Issue: Container won't start**
+```bash
+# Check logs
+docker-compose logs sudatutor
+
+# Check if port 3000 is already in use
+sudo netstat -tulpn | grep 3000
+
+# Rebuild from scratch
+docker-compose down
+docker system prune -a
+docker build -t sudatutor:latest .
+docker-compose up -d
+```
+
+**Issue: API key not working**
+```bash
+# Verify environment variable is set
+docker-compose exec sudatutor printenv | grep GEMINI
+```
+
+**Issue: Can't connect from browser**
+```bash
+# Check firewall
+sudo ufw status
+
+# Check Nginx status
+sudo systemctl status nginx
+
+# Test internal connection
+curl http://localhost:3000
+```
+
+### Security Best Practices
+
+1. **Keep system updated**
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+2. **Use strong firewall rules**
+   ```bash
+   sudo ufw default deny incoming
+   sudo ufw default allow outgoing
+   sudo ufw allow ssh
+   sudo ufw allow 'Nginx Full'
+   ```
+
+3. **Regular backups**
+   ```bash
+   # Backup script
+   tar -czf sudatutor-backup-$(date +%Y%m%d).tar.gz /opt/sudatutor-v6
+   ```
+
+4. **Monitor logs regularly**
+   ```bash
+   sudo tail -f /var/log/nginx/error.log
+   docker-compose logs -f
+   ```
+
+---
+
+## 🏗️ Build for Production (Non-Docker)
 
 ### Build
 
@@ -268,7 +572,7 @@ npm run preview
 
 ### Deployment Options
 
-#### Option 1: Static Hosting (Vercel, Netlify, GitHub Pages)
+#### Static Hosting (Vercel, Netlify, GitHub Pages)
 
 ```bash
 # Build the project
@@ -279,38 +583,18 @@ npm run build
 
 **Environment Variables**: Configure `GEMINI_API_KEY` in your hosting provider's dashboard.
 
-#### Option 2: Docker
+**⚠️ Security Warning**: For production use with public access, implement a backend proxy to secure the API key. The current setup exposes the API key in the browser bundle.
 
-Create `Dockerfile`:
+#### Docker (See Production Deployment section above)
 
-```dockerfile
-FROM node:18-alpine
+Use the provided Dockerfile and docker-compose.yml for containerized deployment.
 
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["npm", "run", "preview"]
-```
-
-Build and run:
-
-```bash
-docker build -t sudatutor .
-docker run -p 3000:3000 -e GEMINI_API_KEY=your-key sudatutor
-```
-
-#### Option 3: Traditional Server
+#### Traditional Server (Manual Deployment)
 
 1. Build the project: `npm run build`
 2. Copy `dist/` folder to your server
-3. Serve with nginx, Apache, or similar
+3. Serve with nginx or Apache
+4. Configure web server to handle SPA routing
 
 ---
 
@@ -352,12 +636,20 @@ npm run preview  # Preview production build
 
 ## 🔒 Security & Privacy
 
-- ✅ API keys stored in environment variables
+- ✅ API keys stored in environment variables (never in code)
 - ✅ No user data stored on servers
 - ✅ All queries processed through Google's secure infrastructure
-- ✅ No tracking or analytics by default
+- ✅ Docker secrets support for enhanced security
+- ✅ HTTPS/SSL recommended for production
+- ⚠️ **Important**: This is a client-side application. For production with public access, implement a backend proxy to secure the API key
 
-**Note**: This is a client-side application. The API key is exposed in the browser. For production use with public access, implement a backend proxy to secure the API key.
+### Securing Your API Key in Production
+
+For production deployments, consider:
+1. **Backend Proxy**: Create a simple backend service that holds the API key
+2. **API Gateway**: Use services like AWS API Gateway or Google Cloud Endpoints
+3. **Environment Variables**: Use Docker secrets or cloud provider secret managers
+4. **Rate Limiting**: Implement rate limiting to prevent abuse
 
 ---
 
@@ -418,8 +710,10 @@ This project is licensed under the **Apache License 2.0** - see the LICENSE file
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/sudatutor-v6/issues)
-- **Documentation**: See `CORPUS_SETUP.md` for detailed setup instructions
+- **GitHub Repository**: [O96a/sudatutor-v6](https://github.com/O96a/sudatutor-v6)
+- **Issues**: [GitHub Issues](https://github.com/O96a/sudatutor-v6/issues)
+- **Documentation**: See `CORPUS_SETUP.md` for detailed curriculum setup instructions
+- **Deployment Guide**: See the [Production Deployment](#-production-deployment) section above
 
 ---
 
