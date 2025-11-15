@@ -3,7 +3,7 @@
  * Run with: node check-store.js
  */
 
-const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAZFeOSrK4WcoOaIPCIijdMsJRmeEitebM';
+const API_KEY = process.env.GEMINI_API_KEY || 'GEMINI_API_KEY';
 const STORE_NAME = 'fileSearchStores/sudan-curriculum-file-searc-0yuzv4zzxz09';
 
 async function checkStore() {
