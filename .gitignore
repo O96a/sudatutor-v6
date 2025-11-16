@@ -58,6 +58,14 @@ curriculum-data/
 # Ignore internal docs and markdown files not required by end users
 *.md
 !README.md
+!DEPLOYMENT.md
+!DEPLOYMENT_GUIDE.md
+!QUICK_DEPLOY.md
+!LINUX_DEPLOYMENT.md
+!CORPUS_SETUP.md
+!CONTRIBUTING.md
+!PRODUCTION_SUMMARY.md
+!GITHUB_PUSH_SUMMARY.md
 
 # Local artifacts
 tracked-files.txt
