@@ -266,15 +266,22 @@ cd /opt/apps/sudatutor-v6
 # or
 cd ~/sudatutor-v6
 
+# IMPORTANT: Load environment variables before building
+# Docker needs to read the .env file during build
+export $(grep -v '^#' .env | xargs)
+
 # Build the Docker image (this may take 5-10 minutes)
-docker-compose build
+# The API key will be baked into the static files during build
+docker-compose build --no-cache
 
 # View build progress
 # You should see:
 # - Installing npm dependencies
-# - Building the application
+# - Building the application with Vite
 # - Creating production image
 ```
+
+**Note:** The `--no-cache` flag ensures a fresh build with the latest environment variables.
 
 ### Step 2: Start the Application
 
@@ -592,7 +599,10 @@ docker-compose up -d
 # Pull latest code
 git pull origin main
 
-# Rebuild and restart
+# Load environment variables
+export $(grep -v '^#' .env | xargs)
+
+# Rebuild and restart (with --no-cache to ensure env vars are updated)
 docker-compose down
 docker-compose build --no-cache
 docker-compose up -d
@@ -647,13 +657,26 @@ docker-compose up -d
 # Verify environment file
 cat .env
 
-# Check if environment is loaded in container
-docker exec sudatutor-app env | grep GEMINI_API_KEY
+# Ensure the API key is properly formatted (no quotes, spaces, or special characters)
+# Correct format:
+# GEMINI_API_KEY=AIza...
 
-# Restart container with new env
+# Load environment variables into shell
+export $(grep -v '^#' .env | xargs)
+
+# Verify it's loaded
+echo $GEMINI_API_KEY
+
+# Rebuild with the API key baked into the static files
 docker-compose down
+docker-compose build --no-cache
 docker-compose up -d
+
+# Check if it's working
+docker-compose logs -f
 ```
+
+**Important:** For static site builds (like Vite), the API key must be available **during build time**, not just runtime. That's why we export it before building.
 
 ### Issue 3: Permission Denied
 
@@ -791,6 +814,9 @@ sudo systemctl reload nginx
 ## 🎯 Quick Reference Commands
 
 ```bash
+# Load environment variables (do this before building!)
+export $(grep -v '^#' .env | xargs)
+
 # View application
 docker-compose ps
 
@@ -800,8 +826,8 @@ docker-compose logs -f
 # Restart application
 docker-compose restart
 
-# Update application
-git pull && docker-compose down && docker-compose up -d --build
+# Update application with env vars
+git pull && export $(grep -v '^#' .env | xargs) && docker-compose down && docker-compose up -d --build --no-cache
 
 # Check health
 curl http://localhost:3000

@@ -6,6 +6,14 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Accept build arguments for environment variables
+ARG GEMINI_API_KEY
+ARG NODE_ENV=production
+
+# Set environment variables for the build
+ENV GEMINI_API_KEY=${GEMINI_API_KEY}
+ENV NODE_ENV=${NODE_ENV}
+
 # Copy package files
 COPY package*.json ./
 
@@ -16,7 +24,7 @@ RUN npm install
 # Copy source files
 COPY . .
 
-# Build the application
+# Build the application (Vite will inject env vars at build time)
 RUN npm run build
 
 # Production stage

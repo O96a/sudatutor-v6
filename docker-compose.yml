@@ -7,6 +7,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
+      args:
+        - GEMINI_API_KEY=${GEMINI_API_KEY}
+        - NODE_ENV=production
     ports:
       - "3000:3000"
     environment:
