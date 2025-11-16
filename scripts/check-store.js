@@ -3,7 +3,14 @@
  * Run with: node check-store.js
  */
 
-const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAZFeOSrK4WcoOaIPCIijdMsJRmeEitebM';
+const API_KEY = process.env.GEMINI_API_KEY;
+
+if (!API_KEY) {
+    console.error('❌ Error: GEMINI_API_KEY environment variable not set');
+    console.error('Please set it with: export GEMINI_API_KEY="your-api-key"');
+    process.exit(1);
+}
+
 const STORE_NAME = 'fileSearchStores/sudan-curriculum-file-searc-0yuzv4zzxz09';
 
 async function checkStore() {

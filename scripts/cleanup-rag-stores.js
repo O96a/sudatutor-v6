@@ -1,7 +1,13 @@
 // Cleanup script to delete old RAG stores
 // Run with: node cleanup-rag-stores.js
 
-const API_KEY = 'AIzaSyAZFeOSrK4WcoOaIPCIijdMsJRmeEitebM';
+const API_KEY = process.env.GEMINI_API_KEY;
+
+if (!API_KEY) {
+    console.error('❌ Error: GEMINI_API_KEY environment variable not set');
+    console.error('Please set it with: export GEMINI_API_KEY="your-api-key"');
+    process.exit(1);
+}
 
 async function listRagStores() {
     try {
