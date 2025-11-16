@@ -58,3 +58,6 @@ curriculum-data/
 # Ignore internal docs and markdown files not required by end users
 *.md
 !README.md
+
+# Local artifacts
+tracked-files.txt
