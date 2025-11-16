@@ -2,7 +2,7 @@
 
 # المعلم السوداني (Sudanese Teacher)
 
-<img width="1200" height="475" alt="Sudanese Teacher Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)
